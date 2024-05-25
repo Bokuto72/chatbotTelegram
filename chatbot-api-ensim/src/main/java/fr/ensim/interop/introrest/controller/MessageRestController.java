@@ -16,7 +16,7 @@ public class MessageRestController {
 	
 	@Value("${telegram.api.url}")
 	private String telegramApiUrl;
-	private String telegramApiToken = "6861595645:AAGZl6Ztk5kq9GcnZgrqAizESF_w-0Kj3pg";
+
 	@Value("${telegram.bot.id}")
 	private String telegramBotId;
 	private long chatId = 6984281278L;
@@ -30,7 +30,7 @@ public class MessageRestController {
 
 	public ApiResponseUpdateTelegram getUpdates(Integer offset) {
 		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<ApiResponseUpdateTelegram> responseEntity = restTemplate.getForEntity(telegramApiUrl + telegramApiToken + "/getUpdates&offset={offset}", ApiResponseUpdateTelegram.class, offset);
+		ResponseEntity<ApiResponseUpdateTelegram> responseEntity = restTemplate.getForEntity(telegramApiUrl + "/getUpdates&offset={offset}", ApiResponseUpdateTelegram.class, offset);
 
 
 
