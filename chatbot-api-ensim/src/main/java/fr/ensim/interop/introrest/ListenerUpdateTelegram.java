@@ -1,5 +1,6 @@
 package fr.ensim.interop.introrest;
 
+import fr.ensim.interop.introrest.controller.MessageRestController;
 import fr.ensim.interop.introrest.model.telegram.ApiResponseUpdateTelegram;
 import fr.ensim.interop.introrest.model.telegram.Message;
 import fr.ensim.interop.introrest.model.telegram.Update;
@@ -12,18 +13,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// TODO
-
-
 @Component
 public class ListenerUpdateTelegram implements CommandLineRunner {
-
-	private Integer updateId = 389257981;
+	private Integer updateId = 389257984;
+	private MessageRestController messageRestController;
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -36,20 +35,17 @@ public class ListenerUpdateTelegram implements CommandLineRunner {
 			@Override
 			public void run() {
 				System.out.println("Pooling...");
-				ApiResponseUpdateTelegram apiResponseUpdateTelegram = new ApiResponseUpdateTelegram();
-				apiResponseUpdateTelegram.getResult().add(getUpdates(updateId));
+				ApiResponseUpdateTelegram apiResponseUpdateTelegram = messageRestController.getUpdates(updateId);
+
+				if(!apiResponseUpdateTelegram.getResult().isEmpty()) {
+					List<Update> updates = apiResponseUpdateTelegram.getResult();
+					updateId = updates.get(0).getUpdateId();
+					System.out.println("message : " + updates.get(0).getMessage());
+				}
 			}
 		};
 		timer.schedule(timerTask, delay);
 	}
 
-	@GetMapping("/getUpdates")
-	public Update getUpdates(@RequestParam("offset") Integer offset) {
-		Update update = new Update();
-		if(updateId != offset) {
 
-		}
-		System.out.println(update.getMessage().getText());
-		return update;
-	}
 }
