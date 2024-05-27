@@ -21,6 +21,7 @@ public class MessageRestController {
 	private String telegramBotId;
 	private long chatId = 6984281278L;
 
+	RestTemplate restTemplate = new RestTemplate();
 
 	//Opérations sur la ressource Message
 	@PostMapping("/sendMessage")
@@ -28,12 +29,10 @@ public class MessageRestController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
-	public ApiResponseUpdateTelegram getUpdates(Integer offset) {
-		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<ApiResponseUpdateTelegram> responseEntity = restTemplate.getForEntity(telegramApiUrl + "/getUpdates&offset={offset}", ApiResponseUpdateTelegram.class, offset);
+	public ResponseEntity<ApiResponseUpdateTelegram> getUpdates(Integer offset) {
+		//System.out.println(telegramApiUrl+"/getUpdates&offset=" + offset);
+		ApiResponseUpdateTelegram responseEntity = restTemplate.getForObject(telegramApiUrl + "/getUpdates?offset={offset}", ApiResponseUpdateTelegram.class, offset);
 
-
-
-		return responseEntity.getBody();
+		return ResponseEntity.ok(responseEntity);
 	}
 }

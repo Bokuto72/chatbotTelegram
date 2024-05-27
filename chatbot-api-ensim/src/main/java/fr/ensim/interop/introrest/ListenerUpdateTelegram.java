@@ -4,6 +4,7 @@ import fr.ensim.interop.introrest.controller.MessageRestController;
 import fr.ensim.interop.introrest.model.telegram.ApiResponseUpdateTelegram;
 import fr.ensim.interop.introrest.model.telegram.Message;
 import fr.ensim.interop.introrest.model.telegram.Update;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,9 @@ import java.util.logging.Logger;
 
 @Component
 public class ListenerUpdateTelegram implements CommandLineRunner {
-	private Integer updateId = 389257984;
+	private Integer updateId = 389257989;
+
+	@Autowired
 	private MessageRestController messageRestController;
 
 	@Override
@@ -30,22 +33,33 @@ public class ListenerUpdateTelegram implements CommandLineRunner {
 		
 		// Operation de pooling pour capter les evenements Telegram
 		Timer timer = new Timer();
-		long delay = 5000L;
-		TimerTask timerTask = new TimerTask() {
+		timer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
 				System.out.println("Pooling...");
-				ApiResponseUpdateTelegram apiResponseUpdateTelegram = messageRestController.getUpdates(updateId);
 
-				if(!apiResponseUpdateTelegram.getResult().isEmpty()) {
-					List<Update> updates = apiResponseUpdateTelegram.getResult();
-					updateId = updates.get(0).getUpdateId();
-					System.out.println("message : " + updates.get(0).getMessage());
+				try {
+					ApiResponseUpdateTelegram apiResponseUpdateTelegram = messageRestController.getUpdates(updateId).getBody();
+                    if(!apiResponseUpdateTelegram.getResult().isEmpty()) {
+						List<Update> updates = apiResponseUpdateTelegram.getResult();
+						updateId = updates.get(0).getUpdateId()+1;
+						String message = updates.get(0).getMessage().getText();
+						System.out.println("message : " + message);
+						traitementMessage(message);
+					}
+				} catch (Exception e) {
+					Logger.getLogger("ListenerUpdateTelegram").log(Level.WARNING, e.getMessage());
 				}
 			}
-		};
-		timer.schedule(timerTask, delay);
+		}, 0, 5000);
 	}
 
+	private void traitementMessage(String message) {
+		if(message.toLowerCase().contains("meteo")) {
 
+		}
+		if(message.toLowerCase().contains("blague")) {
+			
+		}
+	}
 }
